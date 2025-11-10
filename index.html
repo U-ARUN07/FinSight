@@ -4,135 +4,107 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FinSight — Smart Task & Finance Tracker</title>
+  <title>FinSight — Smart Tracker</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1170/1170576.png">
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 </head>
 
 <body>
-  <!-- Splash -->
-  <div id="splash">
-    <h1 class="glow">FinSight</h1>
-    <p class="tagline">Organize • Analyze • Achieve</p>
-  </div>
-
-  <!-- Animated GitHub Ribbon -->
-  <a href="https://github.com/U-ARUN07" class="github-corner" target="_blank" aria-label="GitHub Profile">
+  <!-- GitHub animated ribbon -->
+  <a href="https://github.com/U-ARUN07/FinSight" class="github-corner" target="_blank"
+    aria-label="View source on GitHub">
     <svg width="80" height="80" viewBox="0 0 250 250">
-      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
-      <path class="octo-arm" style="transform-origin:130px 106px" d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6
-           C122.0,82.7 120.5,78.6 120.5,78.6
-           C119.2,72.0 123.4,76.3 123.4,76.3
-           C127.3,80.9 125.5,87.3 125.5,87.3
-           C122.9,97.6 130.6,101.9 134.4,103.2"></path>
-      <path class="octo-body" d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4
-           L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6
-           C133.8,88.0 127.5,74.4 143.8,58.0
-           C148.5,53.4 154.0,51.2 159.7,51.0
-           C160.3,49.4 163.2,43.6 171.4,40.1
-           C171.4,40.1 176.1,42.5 178.8,56.2
-           C183.1,58.6 187.2,61.8 190.9,65.4
-           C194.5,69.0 197.7,73.2 200.1,77.6
-           C213.8,80.2 216.3,84.9 216.3,84.9
-           C212.7,93.1 206.9,96.0 205.4,96.6
-           C205.1,102.4 203.0,107.8 198.3,112.5
-           C181.9,128.9 168.3,122.5 157.7,114.1
-           C157.9,116.9 156.7,120.9 152.7,124.9
-           L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"></path>
+      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z" fill="#151513"></path>
+      <path class="octo-arm" fill="currentColor" style="transform-origin:130px 106px" d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0
+        123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2">
+      </path>
+      <path class="octo-body" fill="currentColor" d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6
+        C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1
+        C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6
+        C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5
+        C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5
+        C139.8,137.7 141.6,141.9 141.8,141.8 Z">
+      </path>
     </svg>
   </a>
 
-  <!-- Top Controls -->
-  <div class="top-controls">
-    <div class="theme-toggle">
-      <button id="themeBtn" class="small primary">Light Theme</button>
-      <i id="themeIcon" class="fa-solid fa-sun"></i>
+  <header>
+    <h1>💰 FinSight</h1>
+    <div class="actions">
+      <button id="themeBtn">🌓 Theme</button>
+      <button id="logoutBtn" class="ghost">Logout</button>
     </div>
-    <button id="settingsBtn" class="small">Settings</button>
-  </div>
+  </header>
 
-  <!-- Settings Modal -->
-  <div id="settingsModal" class="modal hidden">
-    <div class="modal-card">
-      <h3>FinSight Settings</h3>
-      <label>Owner</label><input id="owner" />
-      <label>Repo</label><input id="repo" />
-      <label>PAT</label><input id="pat" />
-      <div class="flex right">
-        <button id="saveSettings" class="primary">Save</button>
-        <button id="closeSettings">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Container -->
-  <div class="container">
-    <section id="landing" class="section fade">
-      <h1>Welcome to <span class="brand">FinSight</span></h1>
-      <p>Track your tasks, finances, and analytics — all stored securely in your GitHub repo.</p>
-      <button id="getStarted" class="primary">Get Started</button>
-    </section>
-
-    <section id="auth" class="section hidden">
-      <h2>Login or Register</h2>
-      <div class="flex">
-        <input id="username" placeholder="Username" />
-        <button id="register" class="primary">Register</button>
+  <main>
+    <!-- Auth -->
+    <section id="auth" class="card">
+      <h2>Sign in / Register</h2>
+      <input id="username" placeholder="Enter a username" />
+      <div>
+        <button id="register">Register</button>
         <button id="login" class="primary">Login</button>
       </div>
+      <p class="muted">Your data is saved securely to our backend and stored per user in GitHub.</p>
     </section>
 
+    <!-- Dashboard -->
     <section id="dashboard" class="hidden">
-      <h2 id="welcomeUser" class="welcome"></h2>
-      <div class="grid grid-2">
-        <div class="section">
-          <h2>Tasks</h2>
-          <div class="flex">
-            <input id="taskText" placeholder="Task" />
-            <input id="taskDue" type="date" />
-            <button id="addTask" class="primary">Add</button>
-          </div>
-          <div id="taskList"></div>
-        </div>
+      <h2 id="welcome">Welcome</h2>
 
-        <div class="section">
-          <h2>Finance</h2>
-          <div class="flex">
-            <select id="txnType">
+      <div class="grid">
+        <div class="card">
+          <h3>Finance</h3>
+          <div class="stats">
+            <div class="pill">Income ₹<span id="incSum">0</span></div>
+            <div class="pill red">Expense ₹<span id="expSum">0</span></div>
+            <div class="pill yellow">Balance ₹<span id="balSum">0</span></div>
+          </div>
+          <form id="txnForm" class="row">
+            <input id="amount" type="number" min="1" placeholder="Amount" required />
+            <input id="category" placeholder="Category (e.g., Food)" />
+            <select id="type">
               <option value="income">Income</option>
               <option value="expense">Expense</option>
             </select>
-            <input id="amount" type="number" placeholder="Amount" />
-            <input id="category" placeholder="Category" />
-            <button id="addTxn" class="primary">Add</button>
-          </div>
-          <div id="financeSummary" class="flex"></div>
-          <canvas id="expenseBar"></canvas>
-          <canvas id="balanceLine"></canvas>
+            <button type="submit" class="primary">Add</button>
+            <button type="button" id="resetFinance" class="ghost">Reset</button>
+          </form>
+          <canvas id="pie"></canvas>
+          <canvas id="bar"></canvas>
+        </div>
+
+        <div class="card">
+          <h3>Tasks</h3>
+          <form id="taskForm" class="row">
+            <input id="taskText" placeholder="Task" />
+            <input id="taskDue" type="date" />
+            <button type="submit" class="primary">Add</button>
+            <button type="button" id="clearTasks" class="ghost">Clear All</button>
+          </form>
+          <div id="taskList"></div>
         </div>
       </div>
 
-      <div class="section">
-        <h2>Analytics</h2>
-        <canvas id="taskPie"></canvas>
-      </div>
-
-      <div class="flex right">
-        <button id="logout" class="danger">Logout</button>
-        <button id="deleteUser" class="danger">Delete Account</button>
+      <div class="card">
+        <h3>History</h3>
+        <ul id="history"></ul>
+        <button id="clearHistory" class="ghost">Clear History</button>
       </div>
     </section>
-  </div>
+  </main>
 
   <footer>
-    <a href="mailto:u.arunbabya1234@gmail.com" title="Email"><i class="fa-solid fa-envelope"></i></a>
-    <a href="https://github.com/U-ARUN07" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
-    <p>© 2025 <b>U ARUN</b></p>
+    <span>© 2025 U ARUN</span>
+    <a href="mailto:u.arunbabya1234@gmail.com" title="Email"><img
+        src="https://cdn-icons-png.flaticon.com/512/542/542638.png" alt="email"></a>
+    <a href="https://github.com/U-ARUN07" target="_blank" title="GitHub"><img
+        src="https://cdn-icons-png.flaticon.com/512/733/733553.png" alt="github"></a>
   </footer>
 
-  <div id="notify" class="notification" style="display:none;"></div>
-  <script src="app.js"></script>
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
 </body>
 
 </html>
