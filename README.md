@@ -3,8 +3,7 @@
 FinSight is an **intelligent personal finance and productivity web app** designed to simplify expense tracking, income management, and task organization — all in one dashboard.
 It combines **real-time analytics**, **interactive charts**, and **secure cloud storage** on GitHub, with a **modern responsive UI** that adapts to any device.
 
-Developed by [**U ARUN**](https://github.com/U-ARUN07) — a Computer Science & Engineering student passionate about building smart, data-driven applications that solve real-world problems.
-
+Developed by [**U ARUN**](https://github.com/U-ARUN07) 
 ---
 
 ## 🌐 Live Demo
