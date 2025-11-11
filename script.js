@@ -1,222 +1,194 @@
-/* CONFIG */
-const API_URL = "https://fin-sight-api.vercel.app/api/update"; // your Vercel API
-const GH_OWNER = "U-ARUN07";
-const GH_REPO  = "FinSight";
+// Elements
+const incomeEl = document.getElementById("income");
+const expenseEl = document.getElementById("expense");
+const balanceEl = document.getElementById("balance");
 
-/* ELEMENTS */
-const auth = document.getElementById("auth");
-const usernameEl = document.getElementById("username");
-const registerBtn = document.getElementById("register");
-const loginBtn = document.getElementById("login");
-
-const dashboard = document.getElementById("dashboard");
-const welcome = document.getElementById("welcome");
-const themeBtn = document.getElementById("themeBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const toast = document.getElementById("toast");
-
-/* Finance */
-const incSum = document.getElementById("incSum");
-const expSum = document.getElementById("expSum");
-const balSum = document.getElementById("balSum");
-const txnForm = document.getElementById("txnForm");
+const descEl = document.getElementById("desc");
 const amountEl = document.getElementById("amount");
-const categoryEl = document.getElementById("category");
 const typeEl = document.getElementById("type");
-const resetFinance = document.getElementById("resetFinance");
 
-/* Tasks */
-const taskForm = document.getElementById("taskForm");
-const taskText = document.getElementById("taskText");
-const taskDue  = document.getElementById("taskDue");
-const taskList = document.getElementById("taskList");
-const clearTasks = document.getElementById("clearTasks");
+const listEl = document.getElementById("transactions-list");
 
-/* History */
-const historyEl = document.getElementById("history");
-const clearHistoryBtn = document.getElementById("clearHistory");
+const addBtn = document.getElementById("add-btn");
+const clearBtn = document.getElementById("clear-btn");
 
-/* Charts */
+const logoutBtn = document.getElementById("logout");
+const themeBtn = document.getElementById("theme-toggle");
+
+const usernameInput = document.getElementById("username");
+const registerBtn = document.getElementById("register-btn");
+const loginBtn = document.getElementById("login-btn");
+const authSection = document.getElementById("auth-section");
+const dashboard = document.querySelector(".dashboard");
+const welcomeMsg = document.getElementById("welcome-msg");
+
+// State (per-user in localStorage)
+let currentUser = localStorage.getItem("finsight-current-user");
+let users = JSON.parse(localStorage.getItem("finsight-users") || "{}");
+
+// Charts
 let pieChart, barChart;
 
-/* STATE */
-let currentUser = null;
-let data = { transactions:[], tasks:[], history:[] };
+// Helpers
+const saveUsers = () => localStorage.setItem("finsight-users", JSON.stringify(users));
 
-/* UTILS */
-const showToast = (msg)=>{ toast.textContent=msg; toast.style.display="block"; setTimeout(()=>toast.style.display="none",2000); };
-const rawUrl = (u)=>`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/data/users/${encodeURIComponent(u)}.json?ts=${Date.now()}`;
+function render() {
+  if (!currentUser) return;
 
-/* THEME */
-themeBtn.onclick = () => {
-  document.body.classList.toggle("light");
-  themeBtn.textContent = document.body.classList.contains("light") ? "🌙 Theme" : "🌓 Theme";
-  drawCharts();
-};
+  const data = users[currentUser] || [];
+  let income = 0, expense = 0;
 
-/* AUTH */
-registerBtn.onclick = async () => {
-  const u = usernameEl.value.trim();
-  if(!u) return showToast("Enter username");
-  currentUser = u;
-  // create empty record
-  data = { transactions:[], tasks:[], history:[] };
-  await save();
-  enterApp();
-};
-loginBtn.onclick = async () => {
-  const u = usernameEl.value.trim();
-  if(!u) return showToast("Enter username");
-  currentUser = u;
-  await load();
-  enterApp();
-};
-logoutBtn.onclick = ()=>{ localStorage.removeItem("fs_user"); location.reload(); };
+  // Build list
+  listEl.innerHTML = "";
+  data.forEach((t, i) => {
+    if (t.type === "income") income += t.amount;
+    else expense += t.amount;
 
-function enterApp(){
-  localStorage.setItem("fs_user", currentUser);
-  welcome.textContent = `Welcome, ${currentUser}`;
-  auth.classList.add("hidden");
-  dashboard.classList.remove("hidden");
-  renderAll();
-}
+    const li = document.createElement("li");
 
-/* LOAD & SAVE */
-async function load(){
-  try{
-    const res = await fetch(rawUrl(currentUser), { cache:"no-cache" });
-    if(res.ok){ data = await res.json(); }
-    else { data = { transactions:[], tasks:[], history:[] }; }
-  }catch{ data = { transactions:[], tasks:[], history:[] }; }
-}
-async function save(){
-  try{
-    await fetch(API_URL, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ username: currentUser, data })
-    });
-  }catch(e){ console.error(e); showToast("Save failed"); }
-}
-
-/* FINANCE */
-txnForm.onsubmit = async (e)=>{
-  e.preventDefault();
-  const amount = +amountEl.value;
-  if(!amount) return;
-  data.transactions.push({
-    type: typeEl.value,
-    category: categoryEl.value.trim() || "General",
-    amount,
-    date: new Date().toISOString().slice(0,10)
+    li.innerHTML = `
+      <div class="tx-left">
+        <span class="badge ${t.type}">${t.type === "income" ? "IN" : "OUT"}</span>
+        <span class="tx-desc">${escapeHTML(t.desc)}</span>
+      </div>
+      <div class="tx-right" style="display:flex; align-items:center; gap:12px">
+        <span class="tx-amt">₹${t.amount.toLocaleString()}</span>
+        <span class="tx-actions">
+          <button type="button" aria-label="Delete transaction" data-del="${i}">Delete</button>
+        </span>
+      </div>
+    `;
+    listEl.appendChild(li);
   });
-  data.history.unshift({ when:new Date().toLocaleString(), action:`txn-${typeEl.value}`, amount });
-  await save(); await load(); renderAll();
-  txnForm.reset();
-};
-resetFinance.onclick = async ()=>{
-  if(!confirm("Reset finance data?")) return;
-  data.transactions = [];
-  data.history.unshift({ when:new Date().toLocaleString(), action:"finance-reset" });
-  await save(); renderAll();
-};
 
-/* TASKS */
-taskForm.onsubmit = async (e)=>{
-  e.preventDefault();
-  const text = taskText.value.trim(); if(!text) return;
-  data.tasks.push({ text, due: taskDue.value || "", done:false, created:new Date().toISOString() });
-  data.history.unshift({ when:new Date().toLocaleString(), action:"task-add", text });
-  await save(); renderAll(); taskForm.reset();
-};
-clearTasks.onclick = async ()=>{
-  if(!confirm("Delete ALL tasks?")) return;
-  data.tasks = [];
-  data.history.unshift({ when:new Date().toLocaleString(), action:"task-clear" });
-  await save(); renderAll();
-};
-function bindTaskButtons(){
-  [...taskList.querySelectorAll("[data-toggle]")].forEach(btn=>{
-    btn.onclick = async ()=>{
-      const i = +btn.dataset.toggle; data.tasks[i].done = !data.tasks[i].done;
-      data.history.unshift({ when:new Date().toLocaleString(), action:`task-${data.tasks[i].done?"done":"undo"}` });
-      await save(); renderAll();
+  // Totals
+  incomeEl.textContent = income.toLocaleString();
+  expenseEl.textContent = expense.toLocaleString();
+  balanceEl.textContent = (income - expense).toLocaleString();
+
+  // Bind delete buttons
+  listEl.querySelectorAll("[data-del]").forEach(btn => {
+    btn.onclick = () => {
+      const idx = +btn.dataset.del;
+      users[currentUser].splice(idx, 1);
+      saveUsers();
+      render();
     };
   });
-  [...taskList.querySelectorAll("[data-del]")].forEach(btn=>{
-    btn.onclick = async ()=>{
-      const i = +btn.dataset.del; data.tasks.splice(i,1);
-      data.history.unshift({ when:new Date().toLocaleString(), action:"task-del" });
-      await save(); renderAll();
-    };
-  });
-}
 
-/* HISTORY */
-clearHistoryBtn.onclick = async ()=>{
-  data.history = []; await save(); renderAll();
-};
-
-/* RENDER */
-function renderAll(){
-  // Finance sums
-  const inc = data.transactions.filter(t=>t.type==="income").reduce((a,b)=>a+b.amount,0);
-  const exp = data.transactions.filter(t=>t.type==="expense").reduce((a,b)=>a+b.amount,0);
-  incSum.textContent = inc.toFixed(2); expSum.textContent = exp.toFixed(2); balSum.textContent = (inc-exp).toFixed(2);
-
-  // Tasks list
-  taskList.innerHTML = "";
-  data.tasks.forEach((t,i)=>{
-    const div = document.createElement("div"); div.className="item";
-    const overdue = (!t.done && t.due && new Date(t.due) < new Date());
-    div.innerHTML = `
-      <span>${escape(t.text)} ${t.due?`<span class="meta">• ${t.due}${overdue?" (overdue)":""}</span>`:""}</span>
-      <span>
-        <button class="ghost" data-toggle="${i}">${t.done?"Undo":"Done"}</button>
-        <button class="ghost" data-del="${i}">Del</button>
-      </span>`;
-    taskList.appendChild(div);
-  });
-  bindTaskButtons();
-
-  // History
-  historyEl.innerHTML = data.history.slice(0,50).map(h=>`<li>${escape(h.when)} — ${escape(h.action)}</li>`).join("");
+  // Persist
+  users[currentUser] = data;
+  saveUsers();
 
   // Charts
-  drawCharts();
+  updateCharts(income, expense, data);
 }
-function drawCharts(){
-  // Pie (income vs expense)
-  const inc = data.transactions.filter(t=>t.type==="income").reduce((a,b)=>a+b.amount,0);
-  const exp = data.transactions.filter(t=>t.type==="expense").reduce((a,b)=>a+b.amount,0);
-  const pieCtx = document.getElementById("pie").getContext("2d");
-  if(pieChart) pieChart.destroy();
-  pieChart = new Chart(pieCtx,{
-    type:"pie",
-    data:{ labels:["Income","Expense"], datasets:[{ data:[inc,exp], backgroundColor:["#10b981","#ef4444"] }] },
-    options:{ plugins:{ legend:{ labels:{ color:getComputedStyle(document.body).color } } } }
+
+function updateCharts(income, expense, data) {
+  const pieCtx = document.getElementById("pieChart");
+  const barCtx = document.getElementById("barChart");
+
+  if (pieChart) pieChart.destroy();
+  if (barChart) barChart.destroy();
+
+  pieChart = new Chart(pieCtx, {
+    type: "pie",
+    data: {
+      labels: ["Income", "Expense"],
+      datasets: [{
+        data: [income, expense],
+        backgroundColor: ["#2563eb", "#dc2626"]
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { position: "bottom" } } }
   });
 
-  // Bar (expense by category)
-  const catMap = {};
-  data.transactions.filter(t=>t.type==="expense").forEach(t=>catMap[t.category]=(catMap[t.category]||0)+t.amount);
-  const labels = Object.keys(catMap), values = Object.values(catMap);
-  const barCtx = document.getElementById("bar").getContext("2d");
-  if(barChart) barChart.destroy();
-  barChart = new Chart(barCtx,{
-    type:"bar",
-    data:{ labels, datasets:[{ label:"Expense by Category", data:values }] },
-    options:{
-      plugins:{ legend:{ labels:{ color:getComputedStyle(document.body).color } } },
-      scales:{ x:{ ticks:{ color:getComputedStyle(document.body).color } }, y:{ ticks:{ color:getComputedStyle(document.body).color } } }
+  barChart = new Chart(barCtx, {
+    type: "bar",
+    data: {
+      labels: data.map(t => t.desc || "(no desc)"),
+      datasets: [{
+        label: "Amount",
+        data: data.map(t => t.amount),
+        backgroundColor: data.map(t => t.type === "income" ? "#2563eb" : "#dc2626")
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
     }
   });
 }
 
-function escape(s){ return String(s).replace(/[&<>"']/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c])); }
+// Sanitize
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));}
 
-/* AUTO LOGIN */
-(async ()=>{
-  const saved = localStorage.getItem("fs_user");
-  if(saved){ currentUser = saved; await load(); enterApp(); }
-})();
+// Auth
+registerBtn.onclick = () => {
+  const u = usernameInput.value.trim();
+  if (!u) return alert("Enter a username!");
+  if (users[u]) return alert("User already exists. Try logging in.");
+  users[u] = [];
+  localStorage.setItem("finsight-current-user", u);
+  currentUser = u;
+  saveUsers();
+  enterApp();
+};
+
+loginBtn.onclick = () => {
+  const u = usernameInput.value.trim();
+  if (!u) return alert("Enter a username!");
+  if (!users[u]) return alert("User not found. Please register first.");
+  localStorage.setItem("finsight-current-user", u);
+  currentUser = u;
+  enterApp();
+};
+
+function enterApp(){
+  authSection.style.display = "none";
+  dashboard.style.display = "block";
+  logoutBtn.style.display = "inline-block";
+  welcomeMsg.textContent = `Welcome, ${currentUser}!`;
+  render();
+}
+
+// Add
+addBtn.onclick = () => {
+  if (!currentUser) return alert("Please login first.");
+  const desc = descEl.value.trim();
+  const amount = Number(amountEl.value);
+  const type = typeEl.value;
+  if (!desc || !amount || amount <= 0) return alert("Enter a valid description and amount.");
+  users[currentUser].push({ desc, amount, type, ts: Date.now() });
+  saveUsers();
+  descEl.value = ""; amountEl.value = "";
+  render();
+};
+
+// Clear
+clearBtn.onclick = () => {
+  if (!currentUser) return;
+  if (!confirm("Delete ALL transactions for this user?")) return;
+  users[currentUser] = [];
+  saveUsers();
+  render();
+};
+
+// Logout
+logoutBtn.onclick = () => {
+  localStorage.removeItem("finsight-current-user");
+  currentUser = null;
+  dashboard.style.display = "none";
+  authSection.style.display = "block";
+  logoutBtn.style.display = "none";
+};
+
+// Theme
+themeBtn.onclick = () => {
+  document.body.classList.toggle("dark");
+  themeBtn.textContent = document.body.classList.contains("dark") ? "☀️ Theme" : "🌓 Theme";
+};
+
+// Auto-login
+if (currentUser) enterApp();

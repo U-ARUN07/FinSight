@@ -97,206 +97,199 @@ FinSight/
 yaml
 Copy code
 
----
+# FinSight
 
 ## 🧰 Step-by-Step Implementation Guide
 
 ### 🪜 1. Clone or Create Project
 
 ```bash
-git clone https://github.com/U-ARUN07/FinSight.git
+git clone [https://github.com/U-ARUN07/FinSight.git](https://github.com/U-ARUN07/FinSight.git)
 cd FinSight
+````
+
 If you’re starting fresh:
 
-bash
-Copy code
+```bash
 mkdir FinSight && cd FinSight
+```
+
 Add files:
 
-index.html
+  * `index.html`
+  * `style.css`
+  * `script.js`
+  * `.github/workflows/update-data.yml`
 
-style.css
+### 🌐 2. Push to GitHub (Frontend)
 
-script.js
-
-.github/workflows/update-data.yml
-
-🌐 2. Push to GitHub (Frontend)
-Create a new repo on GitHub called FinSight
+Create a new repo on GitHub called `FinSight`.
 
 Push from VS Code:
 
-bash
-Copy code
+```bash
 git init
 git add .
 git commit -m "Initial FinSight frontend"
 git branch -M main
-git remote add origin https://github.com/U-ARUN07/FinSight.git
+git remote add origin [https://github.com/U-ARUN07/FinSight.git](https://github.com/U-ARUN07/FinSight.git)
 git push -u origin main
+```
+
 Enable GitHub Pages →
-Settings → Pages → Source = main → Save
+Settings → Pages → Source = `main` → Save
 
-✅ Live site: https://u-arun07.github.io/FinSight/
+**✅ Live site: https://u-arun07.github.io/FinSight/**
 
-⚙️ 3. Backend Setup (Vercel)
-Create a new folder FinSight-API
+### ⚙️ 3. Backend Setup (Vercel)
+
+Create a new folder `FinSight-API`.
 
 Inside, add:
 
-api/update.js
+  * `api/update.js`
+  * `package.json`
 
-package.json
+Push it to GitHub as a new repo `FinSight-API`:
 
-Push it to GitHub as a new repo FinSight-API:
-
-bash
-Copy code
+```bash
 git init
 git add .
 git commit -m "FinSight backend setup"
 git branch -M main
-git remote add origin https://github.com/U-ARUN07/FinSight-API.git
+git remote add origin [https://github.com/U-ARUN07/FinSight-API.git](https://github.com/U-ARUN07/FinSight-API.git)
 git push -u origin main
-Go to Vercel → Import FinSight-API project.
+```
+
+Go to Vercel → Import `FinSight-API` project.
 
 Add environment variable:
 
-ini
-Copy code
+```ini
 GITHUB_TOKEN = <your_personal_access_token>
-Deploy → You’ll get a URL like
-https://fin-sight-api.vercel.app/api/update
+```
 
-🔑 4. Generate GitHub Personal Access Token
+Deploy → You’ll get a URL like
+`https://fin-sight-api.vercel.app/api/update`
+
+### 🔑 4. Generate GitHub Personal Access Token
+
 Go to GitHub → Settings → Developer Settings → Fine-grained Tokens → Generate New Token
 
-Repository Access → Only FinSight
+  * **Repository Access** → Only `FinSight`
+  * **Permissions**:
+      * ✅ Contents: Read and Write
+      * ✅ Workflows: Read and Write
 
-Permissions:
+Copy the token → Add it in Vercel → Project → Environment Variables as `GITHUB_TOKEN`.
 
-✅ Contents: Read and Write
+### 🔗 5. Connect Frontend with Backend
 
-✅ Workflows: Read and Write
+In your `script.js`, update this line:
 
-Copy the token → Add it in Vercel → Project → Environment Variables as GITHUB_TOKEN.
+```javascript
+const API_URL = "[https://fin-sight-api.vercel.app/api/update](https://fin-sight-api.vercel.app/api/update)";
+```
 
-🔗 5. Connect Frontend with Backend
-In your script.js, update this line:
-
-js
-Copy code
-const API_URL = "https://fin-sight-api.vercel.app/api/update";
 Then push changes:
 
-bash
-Copy code
+```bash
 git add script.js
 git commit -m "Connected frontend to live backend"
 git push
-🧪 6. Test Functionality
-Visit → https://u-arun07.github.io/FinSight/
+```
 
-Register/Login with username (e.g. arun)
+### 🧪 6. Test Functionality
 
-Add incomes, expenses, and tasks
+1.  Visit → `https://u-arun07.github.io/FinSight/`
+2.  Register/Login with username (e.g. `arun`)
+3.  Add incomes, expenses, and tasks
+4.  Refresh GitHub → `data/users/arun.json` → ✅ Your data appears\!
 
-Refresh GitHub →
-data/users/arun.json → ✅ Your data appears!
+-----
 
-🧾 Example Data (auto-generated)
-json
-Copy code
+### 🧾 Example Data (auto-generated)
+
+```json
 {
-  "transactions": [
-    {"type": "income", "amount": 5000, "category": "Salary"},
-    {"type": "expense", "amount": 1500, "category": "Rent"}
-  ],
-  "tasks": [
-    {"text": "Submit project report", "due": "2025-11-15", "done": false}
-  ],
-  "history": [
-    {"when": "2025-11-11T21:45:00", "action": "txn-income"}
-  ]
+  "transactions": [
+  d {"type": "income", "amount": 5000, "category": "Salary"},
+    {"type": "expense", "amount": 1500, "category": "Rent"}
+  ],
+  "tasks": [
+    {"text": "Submit project report", "due": "2025-11-15", "done": false}
+  ],
+  "history": [
+    {"when": "2025-11-11T21:45:00", "action": "txn-income"}
+  ]
 }
-🧮 Data Flow
-pgsql
-Copy code
+```
+
+### 🧮 Data Flow
+
+```
 User Action → JS Fetch (Frontend)
-     ↓
+     ↓
 Vercel API (Backend)
-     ↓
+     ↓
 GitHub Dispatch Event
-     ↓
+     ↓
 GitHub Action Workflow
-     ↓
+     ↓
 Writes/Updates JSON file in `data/users/`
-📊 Visual Preview
-Dashboard	Tasks	Charts
+```
 
-💡 Future Enhancements
-🔐 Password-based authentication (Firebase)
+### 📊 Visual Preview
 
-📆 Monthly spending & filter analytics
+Dashboard | Tasks | Charts
+\--- | --- | ---
+*(Add Dashboard Screenshot Here)* | *(Add Tasks Screenshot Here)* | *(Add Charts Screenshot Here)*
 
-📤 Export PDF report summaries
+-----
 
-🔔 Email/SMS task reminders
+### 💡 Future Enhancements
 
-🪙 Multi-currency support
+  * 🔐 Password-based authentication (Firebase)
+  * 📆 Monthly spending & filter analytics
+  * 📤 Export PDF report summaries
+  * 🔔 Email/SMS task reminders
+  * 🪙 Multi-currency support
+  * 🌍 Multi-language interface
 
-🌍 Multi-language interface
+-----
 
-🧑‍💻 Author
-U ARUN
-📧 u.arunbabya1234@gmail.com
-🌐 GitHub → U-ARUN07
-💬 "Transforming ideas into impactful, data-driven digital experiences."
+### 🧑‍💻 Author
 
-📜 License
+**U ARUN**
+
+  * 📧 `u.arunbabya1234@gmail.com`
+  * 🌐 GitHub: [U-ARUN07](https://www.google.com/search?q=https://github.com/U-ARUN07)
+  * 💬 "Transforming ideas into impactful, data-driven digital experiences."
+
+### 📜 License
+
 Released under the MIT License © 2025 U ARUN
+
 You are free to use, modify, and distribute this project with proper credit.
 
-🌟 Support
+### 🌟 Support
+
 If FinSight inspired you:
-⭐ Star the repo → U-ARUN07 / FinSight
 
-“Dream it. Code it. Deploy it.” — U ARUN
+  * ⭐ Star the repo → [U-ARUN07 / FinSight](https://www.google.com/search?q=https://github.com/U-ARUN07/FinSight)
 
-❓ FAQ
-Q1: Why is my data not saving?
-→ Ensure your backend (FinSight-API) is deployed and GITHUB_TOKEN is configured properly.
+> “Dream it. Code it. Deploy it.” — U ARUN
 
-Q2: Can I reset my account?
-→ Yes. Each username file can be manually deleted from data/users/ on GitHub.
+### ❓ FAQ
 
-Q3: Can I host this somewhere else?
-→ Yes! Frontend works on GitHub Pages, Netlify, or Vercel. Backend can stay on Vercel for simplicity.
+**Q1: Why is my data not saving?**
+→ Ensure your backend (`FinSight-API`) is deployed and `GITHUB_TOKEN` is configured properly.
 
-🧩 Add This File
-In VS Code:
+**Q2: Can I reset my account?**
+→ Yes. Each username file can be manually deleted from `data/users/` on GitHub.
 
-bash
-Copy code
-echo "# FinSight" > README.md
-# Paste this full content
-git add README.md
-git commit -m "Added professional detailed README"
-git push
-✅ Your GitHub project will now look professional and complete.
+**Q3: Can I host this somewhere else?**
+→ Yes\! Frontend works on GitHub Pages, Netlify, or Vercel. Backend can stay on Vercel for simplicity.
 
-yaml
-Copy code
-
----
-
-That’s it ✅
-After adding this to your project and pushing it, your GitHub repository will look like a **real open-source, production-grade app**.
-
-Would you like me to now generate your **LICENSE (MIT 2025 – U ARUN)** file so that your repository looks fully professional with license and author details?
-
-
-
-
-
-
+```
+```
