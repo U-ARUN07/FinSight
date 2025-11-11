@@ -91,9 +91,6 @@ FinSight/
 └── users/
 └── (auto-generated user JSON files)
 
-yaml
-Copy code
-
 # FinSight
 
 ## 🧰 Step-by-Step Implementation Guide
