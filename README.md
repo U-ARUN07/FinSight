@@ -61,9 +61,6 @@ data/users/<username>.json
 Backend (Vercel Serverless Function)
 └── api/update.js → Triggers GitHub Action (repository_dispatch)
 
-yaml
-Copy code
-
 ---
 
 ## ⚙️ Tech Stack
